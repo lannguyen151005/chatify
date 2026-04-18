@@ -27,4 +27,5 @@ public class Message {
     private String attachment_url;
     @Column(name = "created_at")
     private Date created_at;
+
 }

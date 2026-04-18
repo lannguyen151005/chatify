@@ -1,12 +1,12 @@
 package alan.nguyen.entity;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import alan.nguyen.common.SystemRole;
+import alan.nguyen.dto.UserDTO;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.sql.Date;
 import java.util.UUID;
 
@@ -19,15 +19,15 @@ public class User extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "password")
     private String password;
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private SystemRoles role = SystemRoles.USER;
+    private SystemRole role = SystemRole.USER;
     @Column(name = "avatar_url")
     private String avatar_url;
     @Column(name = "is_online")
@@ -37,7 +37,16 @@ public class User extends PanacheEntityBase {
     @Column(name = "created_at")
     private Date created_at;
 
-    public enum SystemRoles{
-        USER, ADMIN
+
+    public void map(UserDTO dto){
+        this.id = null;
+        this.username = dto.getUsername();
+        this.email = dto.getEmail();
+        this.password = dto.getPassword();
+        this.role = SystemRole.USER;
+        this.avatar_url = dto.getUsername();
+        this.is_online = dto.is_online();
+        this.last_seen = dto.getLast_seen();
+        this.created_at = dto.getCreated_at();
     }
 }

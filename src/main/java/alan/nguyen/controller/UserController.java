@@ -1,38 +1,50 @@
 package alan.nguyen.controller;
 
+
+import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
-import alan.nguyen.repository.UserResourse;
-import io.smallrye.mutiny.Uni;
+import alan.nguyen.service.UserService;
+
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
 
+
 @Path("/users")
 public class UserController {
 
     @Inject
-    UserResourse repo;
+    UserService repo;
 
     @GET
-    public Uni<List<User>> getAll(){
-        return repo.getAll(); // ✅ đúng
+    @RolesAllowed("ADMIN")
+    public Response getAll(){
+            List<User> list = repo.getAll();
+            return Response.ok(list).build();
+    }
+    @PUT
+    @Path("/{id}")
+    @RolesAllowed({"ADMIN", "USER"})
+    public Response updateUser(@PathParam("id") UUID id, UserDTO dto){
+            return repo.updateUser(id, dto);
     }
 
     @POST
-    public Uni<Boolean> add(User user){
-        return repo.save(user); // ✅ đúng
+    @RolesAllowed({"USER", "ADMIN"})
+    public Response addUser(UserDTO dto){
+            return repo.addUser(dto);
     }
-
     @DELETE
     @Path("/{id}")
-    public Uni<Boolean> delete(UUID id){
-        return repo.delete(id); // ✅ đúng
+    @RolesAllowed("ADMIN")
+    public Response deleteUser(UUID id){
+            return repo.deleteUser(id);
     }
+
 }
 
