@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -23,5 +24,5 @@ public class MessageRead extends PanacheEntityBase {
     @Column(name = "user_id")
     private UUID user_id;
     @Column(name = "read_at")
-    private Date read_at;
+    private LocalDateTime read_at;
 }

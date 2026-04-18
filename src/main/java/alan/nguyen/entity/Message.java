@@ -1,11 +1,12 @@
 package alan.nguyen.entity;
 
+import alan.nguyen.dto.MessageRequestDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -26,6 +27,6 @@ public class Message {
     @Column(name = "attachment_url")
     private String attachment_url;
     @Column(name = "created_at")
-    private Date created_at;
+    private LocalDateTime created_at;
 
 }

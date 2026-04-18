@@ -1,12 +1,13 @@
 package alan.nguyen.entity;
 
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -25,5 +26,6 @@ public class Conversation extends PanacheEntityBase {
     @Column(name = "created_by")
     private UUID created_by;
     @Column(name = "created_at")
-    private Date created_at;
+    private LocalDateTime created_at;
+
 }

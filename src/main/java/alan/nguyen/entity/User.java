@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -33,9 +34,9 @@ public class User extends PanacheEntityBase {
     @Column(name = "is_online")
     private boolean is_online;
     @Column(name = "last_seen")
-    private Date last_seen;
+    private LocalDateTime last_seen;
     @Column(name = "created_at")
-    private Date created_at;
+    private LocalDateTime created_at;
 
 
     public void map(UserDTO dto){

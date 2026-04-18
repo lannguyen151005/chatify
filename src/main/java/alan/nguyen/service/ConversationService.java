@@ -1,0 +1,57 @@
+package alan.nguyen.service;
+
+import alan.nguyen.entity.Conversation;
+import alan.nguyen.entity.Participant;
+import alan.nguyen.entity.User;
+import alan.nguyen.repository.ConversationRepo;
+import alan.nguyen.repository.PaticipantRepo;
+import alan.nguyen.repository.UserRepo;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Response;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@ApplicationScoped
+public class ConversationService{
+
+    @Inject
+    ConversationRepo conversationRepo;
+    @Inject
+    PaticipantRepo paticipantRepository;
+
+    @Inject
+    UserRepo userRepo;
+
+    @Transactional
+    public Response createGroupChat(UUID creator_id, String title, List<UUID> member_id){
+        //Init and save group
+        Conversation conversation = new Conversation();
+        conversation.setConversation_type("GROUP");
+        conversation.setTitle(title);
+        conversation.setCreated_by(creator_id);
+        conversation.setCreated_at(LocalDateTime.now());
+        conversationRepo.persist(conversation);
+
+        //Create participant list
+        List<Participant> participants = new ArrayList<>();
+        participants.add(new Participant(Participant.GroupRoles.ADMIN, creator_id, conversation.getId()));
+        for (UUID memberId : member_id){
+            User existing_user = userRepo.findById(memberId);
+            participants.add(new Participant(Participant.GroupRoles.MEMBER, memberId, conversation.getId()));
+        }
+        paticipantRepository.persist(participants);
+
+        return Response.ok(conversation).build();
+    }
+
+    public List<Conversation> getUserConversations(UUID userId){
+        return conversationRepo.getConversations(userId);
+    }
+}

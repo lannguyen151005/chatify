@@ -1,5 +1,6 @@
 package alan.nguyen.entity;
 
+import alan.nguyen.dto.ParticipantDTO;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,9 +24,22 @@ public class Participant extends PanacheEntityBase {
     private UUID user_id;
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private GroupRoles role = GroupRoles.MEMBER;
+    private GroupRoles group_role = GroupRoles.MEMBER;
 
     public enum GroupRoles{
         MEMBER, MODERATOR, ADMIN
+    }
+
+    public Participant(GroupRoles group_role, UUID user_id, UUID conversation_id) {
+        this.group_role = group_role;
+        this.user_id = user_id;
+        this.conversation_id = conversation_id;
+    }
+
+    public void map(ParticipantDTO dto){
+        this.id = null;
+        this.conversation_id = dto.getConversation_id();
+        this.user_id = dto.getUser_id();
+        this.group_role = GroupRoles.MEMBER;
     }
 }
