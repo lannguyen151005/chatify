@@ -5,6 +5,7 @@ import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
 import alan.nguyen.service.UserService;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @POST
-    @RolesAllowed({"USER", "ADMIN"})
+    @PermitAll
     public Response addUser(UserDTO dto){
             return repo.addUser(dto);
     }

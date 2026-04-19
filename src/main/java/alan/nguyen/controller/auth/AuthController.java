@@ -1,5 +1,6 @@
 package alan.nguyen.controller.auth;
 
+import alan.nguyen.dto.LoginRequestDTO;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.service.UserService;
 import alan.nguyen.service.auth.JwtService;
@@ -24,7 +25,7 @@ public class AuthController {
     @POST
     @Path("/login")
     @PermitAll
-    public Response login(UserDTO dto){
+    public Response login(LoginRequestDTO dto){
         return service.getToken(dto);
     }
 

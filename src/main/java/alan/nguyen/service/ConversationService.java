@@ -44,6 +44,11 @@ public class ConversationService{
         participants.add(new Participant(Participant.GroupRoles.ADMIN, creator_id, conversation.getId()));
         for (UUID memberId : member_id){
             User existing_user = userRepo.findById(memberId);
+            if(existing_user==null)
+                return Response.status(404)
+                                .entity(
+                                        Map.of("message", "User not found")
+                                ).build();
             participants.add(new Participant(Participant.GroupRoles.MEMBER, memberId, conversation.getId()));
         }
         paticipantRepository.persist(participants);

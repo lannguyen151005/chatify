@@ -1,5 +1,6 @@
 package alan.nguyen.service.auth;
 
+import alan.nguyen.dto.LoginRequestDTO;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
 import alan.nguyen.service.UserService;
@@ -26,8 +27,8 @@ public class JwtService {
                 .sign();
     }
 
-    public Response getToken(UserDTO dto) {
-        User existing_user = user_service.find("username = ?1 and password = ?2", dto.getUsername(), dto.getPassword()).firstResult();
+    public Response getToken(LoginRequestDTO dto) {
+        User existing_user = user_service.find("username = ?1 and password = ?2", dto.username, dto.password).firstResult();
         if(existing_user==null)
             return Response.status(404)
                     .entity(
@@ -42,4 +43,5 @@ public class JwtService {
                 )
                 .build();
     }
+
 }
