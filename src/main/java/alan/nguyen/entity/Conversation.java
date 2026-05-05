@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "conversations")
-public class Conversation extends PanacheEntityBase {
+public class Conversation{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

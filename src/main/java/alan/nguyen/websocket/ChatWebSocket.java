@@ -2,7 +2,9 @@ package alan.nguyen.websocket;
 
 import alan.nguyen.dto.MessageRequestDTO;
 import alan.nguyen.entity.Message;
+import alan.nguyen.service.MessageReadService;
 import alan.nguyen.service.MessageService;
+import alan.nguyen.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.security.Authenticated;
@@ -20,7 +22,13 @@ public class ChatWebSocket {
     OpenConnections connections;
 
     @Inject
+    UserService userService;
+
+    @Inject
     MessageService msg_service;
+
+    @Inject
+    MessageReadService msgReadService;
 
     @Inject
     JsonWebToken jwt;
@@ -34,6 +42,7 @@ public class ChatWebSocket {
     public void onOpen(@PathParam("conversation_id") String conversation_id){
         String userId = jwt.getSubject();
         System.out.println("User ["+userId+"] joined the group chat!");
+        userService.updateUserStatus(UUID.fromString(userId), true);
     }
 
     @OnTextMessage
@@ -41,27 +50,42 @@ public class ChatWebSocket {
         //Get user id from token
         UUID senderId = UUID.fromString(jwt.getSubject());
 
+        //TYPING
+        if(request.type.equals("TYPING")){
+            String typing_json = "{\"type\":\"TYPING\", \"senderId\":\"" + senderId + "\"}";
+            broadcastToRoom(UUID.fromString(conversation_id), typing_json);
+            return;
+        }
+
+        //READ
+        if(request.type.equals("READ")){
+            //mark as read in db
+            msgReadService.markAsRead(request.message_id, senderId);
+
+            String read_json = "{\"type\":\"READ\", \"userId\":\"" + senderId + "\", \"message_id\":\"" + request.message_id + "\"}";
+            broadcastToRoom(UUID.fromString(conversation_id), read_json);
+            return;
+        }
         //Save message into database
-        Message saved_msg = messageService.sendMessage(senderId, UUID.fromString(conversation_id), request.content);
+        Message saved_msg = messageService.sendMessage(senderId, UUID.fromString(conversation_id), request.content, request.attachment_url);
 
         //Convert saved message into JSON
         String json_msg = objectMapper.writeValueAsString(saved_msg);
-
-        //get all connections to the conversation
-        connections.forEach(conn -> {
-            //Get the value of conversation_id on URL when connecting
-            String targetConversationId = conn.pathParam("conversation_id");
-
-            //if this connection belongs to the true conversation, do messages loading
-            if(conversation_id.equals(targetConversationId)){
-                conn.sendTextAndAwait(json_msg);
-            }
-        });
+        broadcastToRoom(UUID.fromString(conversation_id), json_msg);
     }
 
     @OnClose
     public void onClose(@PathParam("conversation_id") String conversation_id){
         String user_id = jwt.getSubject();
         System.out.println("User ["+user_id+"] left the group chat ["+conversation_id+"]!");
+        userService.updateUserStatus(UUID.fromString(user_id), false);
+    }
+
+    private void broadcastToRoom(UUID conversation_id, String json_msg){
+        connections.forEach(conn -> {
+            if(conversation_id.toString().equals(conn.pathParam("conversation_id"))){
+                conn.sendTextAndAwait(json_msg);
+            }
+        });
     }
 }

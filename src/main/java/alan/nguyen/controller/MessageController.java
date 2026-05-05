@@ -40,7 +40,7 @@ public class MessageController {
     @POST
     public Response sendMessage(MessageRequestDTO request) {
         UUID senderId = UUID.fromString(jwt.getSubject());
-        Message savedMsg = messageService.sendMessage(senderId, request.conversation_id, request.content);
+        Message savedMsg = messageService.sendMessage(senderId, request.conversation_id, request.content, request.attachment_url);
         return Response.status(Response.Status.CREATED).entity(savedMsg).build();
     }
 }

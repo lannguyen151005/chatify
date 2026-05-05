@@ -3,26 +3,32 @@ package alan.nguyen.service;
 import alan.nguyen.common.SystemRole;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
+import alan.nguyen.repository.UserRepo;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
-public class UserService implements PanacheRepositoryBase<User, UUID> {
+public class UserService{
+
+    @Inject
+    UserRepo userRepo;
 
     public List<User> getAll(){
-        List<User> list = this.findAll().list();
+        List<User> list = userRepo.findAll().list();
         return list;
     }
     @Transactional
     public Response addUser(UserDTO dto){
-        User existing_user = this.find("email = ?1 or username = ?2", dto.getEmail(), dto.getUsername()).firstResult();
+        User existing_user = userRepo.find("email = ?1 or username = ?2", dto.getEmail(), dto.getUsername()).firstResult();
         if(existing_user!=null)
             return Response.status(400)
                     .entity(
@@ -31,21 +37,21 @@ public class UserService implements PanacheRepositoryBase<User, UUID> {
                     .build();
         User newUser = new User();
         newUser.map(dto);
-        this.persist(newUser);
+        userRepo.persist(newUser);
         return Response.ok(
                 Map.of("message", "Adding successfully")
         ).build();
     }
     @Transactional
     public Response updateUser(UUID id, UserDTO dto){
-        User existing_user = this.findById(id);
+        User existing_user = userRepo.findById(id);
         if(existing_user==null)
             return Response.status(404)
                     .entity(
                             Map.of("message", "User not found")
                     )
                     .build();
-        User checkEmail_Username = find("email = ?1 or username = ?2", dto.getEmail(), dto.getUsername()).firstResult();
+        User checkEmail_Username = userRepo.find("email = ?1 or username = ?2", dto.getEmail(), dto.getUsername()).firstResult();
         if(checkEmail_Username!=null && !checkEmail_Username.getId().equals(id))
             return Response.status(400)
                     .entity(
@@ -74,14 +80,14 @@ public class UserService implements PanacheRepositoryBase<User, UUID> {
     }
     @Transactional
     public Response deleteUser(UUID id){
-        User existing_user = this.findById(id);
+        User existing_user = userRepo.findById(id);
         if(existing_user==null)
             return Response.status(404)
                     .entity(
                             Map.of("message", "User not found")
                     )
                     .build();
-        this.delete(existing_user);
+        userRepo.delete(existing_user);
         return Response.ok(
                 Map.of("message", "Deleting successfully")
         ).build();
@@ -92,5 +98,17 @@ public class UserService implements PanacheRepositoryBase<User, UUID> {
                 return true;
         }
         return false;
+    }
+    //Update user'status
+    @Transactional
+    public void updateUserStatus(UUID userId, boolean isOnline){
+        User existing_user = userRepo.findById(userId);
+        if(existing_user!=null){
+            existing_user.set_online(isOnline);
+            if(!isOnline){
+                existing_user.setLast_seen(LocalDateTime.now());
+            }
+            userRepo.persist(existing_user);
+        }
     }
 }

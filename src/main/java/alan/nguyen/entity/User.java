@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "users")
-public class User extends PanacheEntityBase {
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

@@ -3,6 +3,7 @@ package alan.nguyen.service.auth;
 import alan.nguyen.dto.LoginRequestDTO;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
+import alan.nguyen.repository.UserRepo;
 import alan.nguyen.service.UserService;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.inject.Inject;
@@ -15,7 +16,7 @@ import java.util.*;
 public class JwtService {
 
     @Inject
-    UserService user_service;
+    UserRepo userRepo;
 
     public String generateJwt(UUID id,String role){
 
@@ -28,7 +29,7 @@ public class JwtService {
     }
 
     public Response getToken(LoginRequestDTO dto) {
-        User existing_user = user_service.find("username = ?1 and password = ?2", dto.username, dto.password).firstResult();
+        User existing_user = userRepo.find("username = ?1 and password = ?2", dto.username, dto.password).firstResult();
         if(existing_user==null)
             return Response.status(404)
                     .entity(

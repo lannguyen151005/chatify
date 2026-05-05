@@ -37,7 +37,7 @@ public class MessageService{
     }
 
     @Transactional
-    public Message sendMessage(UUID user_id, UUID conversation_id, String content){
+    public Message sendMessage(UUID user_id, UUID conversation_id, String content, String attachment_url){
 
         long count = paticipantRepo.count("conversation_id = ?1 and user_id = ?2", conversation_id, user_id);
         if (count == 0) {
@@ -48,6 +48,7 @@ public class MessageService{
         msg.setConversation_id(conversation_id);
         msg.setUser_id(user_id);
         msg.setContent(content);
+        msg.setAttachment_url(attachment_url);
         msg.setCreated_at(LocalDateTime.now());
 
         messageRepo.persist(msg);
