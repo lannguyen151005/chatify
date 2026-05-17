@@ -31,7 +31,7 @@ public class MessageService{
         if(count==0)
             throw new WebApplicationException("Bạn không có quyền xem tin nhắn của phòng này", Response.Status.FORBIDDEN);
 
-        return messageRepo.find("conversation_id = ?1 order by created_at desc", conversation_id)
+        return messageRepo.find("conversation_id = ?1 order by created_at asc", conversation_id)
                 .page(page, size)
                 .list();
     }

@@ -1,6 +1,7 @@
 package alan.nguyen.controller;
 
 import alan.nguyen.dto.CreateGroupRequestDTO;
+import alan.nguyen.entity.Conversation;
 import alan.nguyen.service.ConversationService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -10,6 +11,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,6 +29,7 @@ public class ConversationController {
 
     @POST
     @Path("/group")
+    @Authenticated
     public Response createGroupChat(CreateGroupRequestDTO dto){
         UUID creator_id = UUID.fromString(jwt.getSubject());
         try {
@@ -40,6 +43,7 @@ public class ConversationController {
         }
     }
     @GET
+    @Authenticated
     public Response getMyConversations(){
         UUID myId = UUID.fromString(jwt.getSubject());
         try {
@@ -52,4 +56,14 @@ public class ConversationController {
                     .build();
         }
     }
+
+    @GET
+    @Path("/{id}/online-users")
+    @Authenticated
+    public Response getOnlineUsers(@PathParam("id") UUID conversationId){
+        List<UUID> onlineUserIds = conversationService.getOnlineUsersId(conversationId);
+
+        return Response.ok(onlineUserIds).build();
+    }
+
 }

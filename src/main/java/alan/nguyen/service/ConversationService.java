@@ -59,4 +59,8 @@ public class ConversationService{
     public List<Conversation> getUserConversations(UUID userId){
         return conversationRepo.getConversations(userId);
     }
+
+    public List<UUID> getOnlineUsersId(UUID conversationId) {
+        return conversationRepo.getOnlineUsersId(conversationId);
+    }
 }
