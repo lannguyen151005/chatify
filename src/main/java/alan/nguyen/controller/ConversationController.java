@@ -1,14 +1,20 @@
 package alan.nguyen.controller;
 
+import alan.nguyen.common.GroupRole;
 import alan.nguyen.dto.CreateGroupRequestDTO;
+import alan.nguyen.dto.MemberResponseDTO;
+import alan.nguyen.dto.PromotingRoleDTO;
 import alan.nguyen.entity.Conversation;
+import alan.nguyen.entity.Participant;
 import alan.nguyen.service.ConversationService;
+import alan.nguyen.service.ParticipantService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import java.awt.*;
 import java.util.List;
@@ -27,8 +33,10 @@ public class ConversationController {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    ParticipantService participantService;
+
     @POST
-    @Path("/group")
     @Authenticated
     public Response createGroupChat(CreateGroupRequestDTO dto){
         UUID creator_id = UUID.fromString(jwt.getSubject());
@@ -66,4 +74,52 @@ public class ConversationController {
         return Response.ok(onlineUserIds).build();
     }
 
+    //Get participants in conversation
+    @GET
+    @Path("/{id}/members")
+    @Authenticated
+    public Response getMembers(@PathParam("id") UUID conversationId){
+        List<MemberResponseDTO> members = participantService.getMembers(conversationId);
+
+        return Response.ok(members).build();
+    }
+
+    //Promoting user's role
+    @PUT
+    @Path("/{id}/members/{user_id}/role")
+    @Authenticated
+    public Response promotingRole(
+            @PathParam("id") UUID conversation_id,
+            @PathParam("user_id") UUID user_id,
+            PromotingRoleDTO dto
+            ){
+        long updated_row = participantService.promotingRole(conversation_id, user_id, dto.role);
+        if(updated_row==0)
+            return Response.serverError().build();
+        return Response.ok(
+                Map.of(
+                        "updated_row",
+                        updated_row
+                )
+        ).build();
+    }
+
+    //kick user out of group
+    @DELETE
+    @Path("/{id}/members/{user_id}")
+    @Authenticated
+    public Response kickUser(
+            @PathParam("id") UUID conversation_id,
+            @PathParam("user_id") UUID user_id
+    ){
+        long deleted_row = participantService.kickUser(conversation_id, user_id);
+        if(deleted_row==0)
+            return Response.serverError().build();
+        return Response.ok(
+                Map.of(
+                        "deleted_row",
+                        deleted_row
+                )
+        ).build();
+    }
 }

@@ -5,6 +5,7 @@ import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
 import alan.nguyen.service.UserService;
 
+import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -16,14 +17,14 @@ import java.util.List;
 import java.util.UUID;
 
 
-@Path("/users")
+@Path("/api/users")
 public class UserController {
 
     @Inject
     UserService repo;
 
     @GET
-    @RolesAllowed("ADMIN")
+    @Authenticated
     public Response getAll(){
             List<User> list = repo.getAll();
             return Response.ok(list).build();

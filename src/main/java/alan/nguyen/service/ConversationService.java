@@ -1,5 +1,6 @@
 package alan.nguyen.service;
 
+import alan.nguyen.common.GroupRole;
 import alan.nguyen.entity.Conversation;
 import alan.nguyen.entity.Participant;
 import alan.nguyen.entity.User;
@@ -41,7 +42,7 @@ public class ConversationService{
 
         //Create participant list
         List<Participant> participants = new ArrayList<>();
-        participants.add(new Participant(Participant.GroupRoles.ADMIN, creator_id, conversation.getId()));
+        participants.add(new Participant(GroupRole.ADMIN.ADMIN, creator_id, conversation.getId()));
         for (UUID memberId : member_id){
             User existing_user = userRepo.findById(memberId);
             if(existing_user==null)
@@ -49,7 +50,7 @@ public class ConversationService{
                                 .entity(
                                         Map.of("message", "User not found")
                                 ).build();
-            participants.add(new Participant(Participant.GroupRoles.MEMBER, memberId, conversation.getId()));
+            participants.add(new Participant(GroupRole.MEMBER, memberId, conversation.getId()));
         }
         paticipantRepository.persist(participants);
 

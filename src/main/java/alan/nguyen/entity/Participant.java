@@ -1,7 +1,7 @@
 package alan.nguyen.entity;
 
+import alan.nguyen.common.GroupRole;
 import alan.nguyen.dto.ParticipantDTO;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,13 +24,10 @@ public class Participant{
     private UUID user_id;
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private GroupRoles group_role = GroupRoles.MEMBER;
+    private GroupRole group_role = GroupRole.MEMBER;
 
-    public enum GroupRoles{
-        MEMBER, MODERATOR, ADMIN
-    }
 
-    public Participant(GroupRoles group_role, UUID user_id, UUID conversation_id) {
+    public Participant(GroupRole group_role, UUID user_id, UUID conversation_id) {
         this.group_role = group_role;
         this.user_id = user_id;
         this.conversation_id = conversation_id;
@@ -40,6 +37,6 @@ public class Participant{
         this.id = null;
         this.conversation_id = dto.getConversation_id();
         this.user_id = dto.getUser_id();
-        this.group_role = GroupRoles.MEMBER;
+        this.group_role = GroupRole.MEMBER;
     }
 }
