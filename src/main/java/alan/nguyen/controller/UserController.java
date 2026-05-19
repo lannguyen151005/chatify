@@ -1,6 +1,7 @@
 package alan.nguyen.controller;
 
 
+import alan.nguyen.dto.UpdateProfileDTO;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.entity.User;
 import alan.nguyen.service.UserService;
@@ -21,31 +22,40 @@ import java.util.UUID;
 public class UserController {
 
     @Inject
-    UserService repo;
+    UserService userService;
+
+    @GET
+    @Path("/{id}")
+    @Authenticated
+    public Response getProfile(
+            @PathParam("id") UUID user_id
+    ){
+        return userService.getProfile(user_id);
+    }
 
     @GET
     @Authenticated
     public Response getAll(){
-            List<User> list = repo.getAll();
+            List<User> list = userService.getAll();
             return Response.ok(list).build();
     }
     @PUT
     @Path("/{id}")
-    @RolesAllowed({"ADMIN", "USER"})
-    public Response updateUser(@PathParam("id") UUID id, UserDTO dto){
-            return repo.updateUser(id, dto);
+    @Authenticated
+    public Response updateUser(@PathParam("id") UUID id, UpdateProfileDTO dto){
+            return userService.updateUser(id, dto);
     }
 
     @POST
     @PermitAll
     public Response addUser(UserDTO dto){
-            return repo.addUser(dto);
+            return userService.addUser(dto);
     }
     @DELETE
     @Path("/{id}")
     @RolesAllowed("ADMIN")
     public Response deleteUser(UUID id){
-            return repo.deleteUser(id);
+            return userService.deleteUser(id);
     }
 
 }

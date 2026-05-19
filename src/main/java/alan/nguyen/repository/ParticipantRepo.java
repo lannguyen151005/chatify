@@ -3,16 +3,24 @@ package alan.nguyen.repository;
 import alan.nguyen.common.GroupRole;
 import alan.nguyen.dto.MemberResponseDTO;
 import alan.nguyen.entity.Participant;
+import alan.nguyen.entity.User;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
 public class ParticipantRepo implements PanacheRepositoryBase<Participant, UUID> {
+
+    @Inject
+    UserRepo userRepo;
+
     public List<MemberResponseDTO> getMembers(UUID conversationId) {
-        String query = "SELECT p.user_id, u.username, p.group_role " +
+        String query = "SELECT p.user_id, u.username, p.group_role, u.avatar_url " +
                 "FROM Participant p " +
                 "JOIN User u ON p.user_id = u.id " +
                 "WHERE p.conversation_id = ?1 " +
@@ -32,5 +40,14 @@ public class ParticipantRepo implements PanacheRepositoryBase<Participant, UUID>
         long deleted_row = delete("conversation_id = ?1 AND user_id = ?2", conversationId, userId);
 
         return deleted_row;
+    }
+
+    public Response addMember(UUID conversationId, List<UUID> memberIds) {
+        List<Participant> participants = new ArrayList<>();
+        for(UUID user_id : memberIds){
+            participants.add(new Participant(GroupRole.MEMBER, user_id, conversationId));
+        }
+        persist(participants);
+        return Response.ok(participants).build();
     }
 }

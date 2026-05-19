@@ -1,13 +1,14 @@
 package alan.nguyen.service;
 
 import alan.nguyen.common.GroupRole;
+import alan.nguyen.dto.UpdateConvDTO;
 import alan.nguyen.entity.Conversation;
 import alan.nguyen.entity.Participant;
 import alan.nguyen.entity.User;
 import alan.nguyen.repository.ConversationRepo;
-import alan.nguyen.repository.PaticipantRepo;
+import alan.nguyen.repository.MessageRepo;
+import alan.nguyen.repository.ParticipantRepo;
 import alan.nguyen.repository.UserRepo;
-import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -25,19 +26,22 @@ public class ConversationService{
     @Inject
     ConversationRepo conversationRepo;
     @Inject
-    PaticipantRepo paticipantRepository;
+    ParticipantRepo paticipantRepository;
+    @Inject
+    MessageRepo messageRepo;
 
     @Inject
     UserRepo userRepo;
 
     @Transactional
-    public Response createGroupChat(UUID creator_id, String title, List<UUID> member_id){
+    public Response createGroupChat(UUID creator_id, String title, List<UUID> member_id, String avatar_url){
         //Init and save group
         Conversation conversation = new Conversation();
         conversation.setConversation_type("GROUP");
         conversation.setTitle(title);
         conversation.setCreated_by(creator_id);
         conversation.setCreated_at(LocalDateTime.now());
+        conversation.setAvatar_url(avatar_url);
         conversationRepo.persist(conversation);
 
         //Create participant list
@@ -63,5 +67,21 @@ public class ConversationService{
 
     public List<UUID> getOnlineUsersId(UUID conversationId) {
         return conversationRepo.getOnlineUsersId(conversationId);
+    }
+
+    @Transactional
+    public Response updateConv(UUID conversationId, UpdateConvDTO dto) {
+        return conversationRepo.updateConv(conversationId, dto);
+    }
+
+    @Transactional
+    public Response deleteGroup(UUID conversationId) {
+
+        conversationRepo.deleteById(conversationId);
+        messageRepo.delete("conversation_id = ?1", conversationId);
+        paticipantRepository.delete("conversation_id = ?1", conversationId);
+
+        return Response.ok().build();
+
     }
 }

@@ -1,9 +1,7 @@
 package alan.nguyen.controller;
 
 import alan.nguyen.common.GroupRole;
-import alan.nguyen.dto.CreateGroupRequestDTO;
-import alan.nguyen.dto.MemberResponseDTO;
-import alan.nguyen.dto.PromotingRoleDTO;
+import alan.nguyen.dto.*;
 import alan.nguyen.entity.Conversation;
 import alan.nguyen.entity.Participant;
 import alan.nguyen.service.ConversationService;
@@ -41,7 +39,7 @@ public class ConversationController {
     public Response createGroupChat(CreateGroupRequestDTO dto){
         UUID creator_id = UUID.fromString(jwt.getSubject());
         try {
-            return conversationService.createGroupChat(creator_id, dto.title, dto.memberIds);
+            return conversationService.createGroupChat(creator_id, dto.title, dto.memberIds, dto.avatar_url);
         } catch (Exception e) {
             return Response.status(500)
                     .entity(
@@ -84,6 +82,14 @@ public class ConversationController {
         return Response.ok(members).build();
     }
 
+    @PUT
+    @Path(("/{id}"))
+    @Authenticated
+    public Response updateConv(@PathParam("id") UUID conversation_id, UpdateConvDTO dto){
+        return conversationService.updateConv(conversation_id, dto);
+    }
+
+
     //Promoting user's role
     @PUT
     @Path("/{id}/members/{user_id}/role")
@@ -122,4 +128,23 @@ public class ConversationController {
                 )
         ).build();
     }
+
+    @DELETE
+    @Path("/{id}")
+    @Authenticated
+    public Response deleteGroup(@PathParam("id") UUID conversation_id){
+        return conversationService.deleteGroup(conversation_id);
+    }
+
+    //Add member to conversation
+    @POST
+    @Path("/{id}/members")
+    @Authenticated
+    public Response addMember(
+            @PathParam("id") UUID conversation_id,
+            AddMemberRequestDTO dto
+    ){
+        return participantService.addMember(conversation_id, dto.memberIds);
+    }
+
 }

@@ -2,7 +2,7 @@ package alan.nguyen.service;
 
 import alan.nguyen.entity.Message;
 import alan.nguyen.repository.MessageRepo;
-import alan.nguyen.repository.PaticipantRepo;
+import alan.nguyen.repository.ParticipantRepo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class MessageService{
 
     @Inject
-    PaticipantRepo paticipantRepo;
+    ParticipantRepo paticipantRepo;
 
     @Inject
     MessageRepo messageRepo;

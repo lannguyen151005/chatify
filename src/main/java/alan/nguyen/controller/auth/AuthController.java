@@ -1,6 +1,7 @@
 package alan.nguyen.controller.auth;
 
 import alan.nguyen.dto.LoginRequestDTO;
+import alan.nguyen.dto.RegisterRequestDTO;
 import alan.nguyen.dto.UserDTO;
 import alan.nguyen.service.UserService;
 import alan.nguyen.service.auth.JwtService;
@@ -14,7 +15,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/auth")
+@Path("/api/auth")
 public class AuthController {
 
     @Inject
@@ -30,10 +31,10 @@ public class AuthController {
     }
 
     @POST
-    @Path("/sign-up")
+    @Path("/register")
     @PermitAll
-    public Response sign_up(UserDTO dto){
-        return user_service.addUser(dto);
+    public Response sign_up(RegisterRequestDTO dto){
+        return user_service.registerUser(dto);
     }
 
 }

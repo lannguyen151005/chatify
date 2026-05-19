@@ -52,10 +52,6 @@ public class ChatWebSocket {
 
         // 1. Cập nhật trạng thái trong db
         userService.updateUserStatus(UUID.fromString(userId), true);
-
-        // 2. Bắn tín hiệu "Tôi vừa ONLINE" cho những người đang ở trong phòng
-        String status_json = "{\"type\":\"STATUS\", \"user_id\":\"" + userId + "\", \"is_online\":true}";
-        broadcastToRoom(UUID.fromString(conversation_id), status_json);
     }
 
     @OnTextMessage
@@ -90,10 +86,6 @@ public class ChatWebSocket {
         if (user_id != null) {
             // 1. Cập nhật trạng thái Offline trong DB
             userService.updateUserStatus(UUID.fromString(user_id), false);
-
-            // 2. Bắn tín hiệu offline cho những người còn lại
-            String status_json = "{\"type\":\"STATUS\", \"user_id\":\"" + user_id + "\", \"is_online\":false}";
-            broadcastToRoom(UUID.fromString(conversation_id), status_json);
         }
 
         // Dọn rác

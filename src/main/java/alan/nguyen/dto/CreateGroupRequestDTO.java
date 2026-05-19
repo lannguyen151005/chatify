@@ -10,4 +10,5 @@ public class CreateGroupRequestDTO {
     public UUID creatorId;
     public String title;
     public List<UUID> memberIds;
+    public String avatar_url;
 }

@@ -9,10 +9,12 @@ public class MemberResponseDTO {
     public UUID user_id;
     public String username;
     public GroupRole group_role;
+    public String avatar_url;
 
-    public MemberResponseDTO(UUID user_id, String username, GroupRole group_role) {
+    public MemberResponseDTO(UUID user_id, String username, GroupRole group_role, String avatar_url) {
         this.user_id = user_id;
         this.username = username;
         this.group_role = group_role;
+        this.avatar_url = avatar_url;
     }
 }

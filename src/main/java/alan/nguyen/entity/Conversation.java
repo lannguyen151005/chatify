@@ -23,9 +23,10 @@ public class Conversation{
     private String conversation_type;
     @Column(name = "title")
     private String title;
+    @Column(name = "avatar_url")
+    private String avatar_url;
     @Column(name = "created_by")
     private UUID created_by;
     @Column(name = "created_at")
     private LocalDateTime created_at;
-
 }

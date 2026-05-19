@@ -1,9 +1,11 @@
 package alan.nguyen.repository;
 
+import alan.nguyen.dto.UpdateConvDTO;
 import alan.nguyen.entity.Conversation;
 import alan.nguyen.entity.Participant;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,5 +28,12 @@ public class ConversationRepo implements PanacheRepositoryBase<Conversation, UUI
                 .createQuery(query, UUID.class)
                 .setParameter(1, conversationId)
                 .getResultList();
+    }
+
+    public Response updateConv(UUID conversationId, UpdateConvDTO dto) {
+        long updated_row = update("title = ?1, avatar_url = ?2 WHERE id = ?3", dto.title, dto.avatar_url, conversationId);
+        if(updated_row==0)
+            return Response.serverError().build();
+        return Response.ok().build();
     }
 }
