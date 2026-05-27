@@ -43,4 +43,10 @@ public class MessageController {
         Message savedMsg = messageService.sendMessage(senderId, request.conversation_id, request.content, request.attachment_url);
         return Response.status(Response.Status.CREATED).entity(savedMsg).build();
     }
+
+    @GET
+    @Path("/recent/{id}")
+    public Response getRecentMessage(@PathParam("id") UUID conversation_id){
+        return Response.ok(messageService.getRecentMessages(conversation_id)).build();
+    }
 }

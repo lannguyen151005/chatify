@@ -1,9 +1,5 @@
 package alan.nguyen.controller;
-
-import alan.nguyen.common.GroupRole;
 import alan.nguyen.dto.*;
-import alan.nguyen.entity.Conversation;
-import alan.nguyen.entity.Participant;
 import alan.nguyen.service.ConversationService;
 import alan.nguyen.service.ParticipantService;
 import io.quarkus.security.Authenticated;
@@ -12,8 +8,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-
 import java.awt.*;
 import java.util.List;
 import java.util.Map;

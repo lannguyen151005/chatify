@@ -8,6 +8,7 @@ import alan.nguyen.service.UserService;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 
 import java.util.*;
@@ -16,7 +17,7 @@ import java.util.*;
 public class JwtService {
 
     @Inject
-    UserRepo userRepo;
+    UserService userService;
 
     public String generateJwt(UUID id,String role){
 
@@ -29,7 +30,7 @@ public class JwtService {
     }
 
     public Response getToken(LoginRequestDTO dto) {
-        User existing_user = userRepo.find("username = ?1 and password = ?2", dto.username, dto.password).firstResult();
+        User existing_user = userService.login(dto.username, dto.password);
         if(existing_user==null)
             return Response.status(404)
                     .entity(
@@ -38,6 +39,9 @@ public class JwtService {
                     .build();
         UUID myId = existing_user.getId();
         String role = existing_user.getRole().toString();
+
+        userService.updateUserStatus(myId, true);
+
         String token = generateJwt(myId, role);
         return Response.ok(
                 Map.of("token", token)

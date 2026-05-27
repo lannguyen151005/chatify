@@ -153,4 +153,9 @@ public class UserService{
                     ).build();
         return userRepo.getProfile(userId);
     }
+
+    public User login(String username, String password) {
+        User existing_user = userRepo.find("username = ?1 AND password = ?2", username, password).firstResult();
+        return existing_user;
+    }
 }

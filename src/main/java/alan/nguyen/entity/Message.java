@@ -22,7 +22,7 @@ public class Message {
     private UUID conversation_id;
     @Column(name = "user_id")
     private UUID user_id;
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
     @Column(name = "attachment_url")
     private String attachment_url;
