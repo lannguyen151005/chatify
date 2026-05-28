@@ -1,5 +1,6 @@
     package alan.nguyen.websocket;
 
+    import alan.nguyen.controller.admin.AdminController;
     import alan.nguyen.dto.MessageRequestDTO;
     import alan.nguyen.dto.MessageResponseDTO;
     import alan.nguyen.entity.Message;
@@ -82,6 +83,29 @@
             broadcastToRoom(UUID.fromString(conversation_id), objectMapper.writeValueAsString(userMsgNode));
 
             if (request.content != null && request.content.toLowerCase().startsWith("@charles")) {
+
+                if (!AdminController.isBotActive()) {
+                    try {
+                        String disableContent = "Trời nóng quá nên tôi đang nghỉ mát không tiện giúp bạn mất rùi. Thông cảm chút nhoa <3!";
+                        ObjectNode disabledNode = objectMapper.createObjectNode();
+                        disabledNode.put("type", "CHAT");
+                        disabledNode.put("id", System.currentTimeMillis());
+                        disabledNode.put("user_id", "2d61b0d1-1512-494b-ba1d-bf1c55de1173");
+                        disabledNode.put("content", disableContent);
+                        disabledNode.put("attachment_url", (String) null);
+
+                        broadcastToRoom(UUID.fromString(conversation_id), objectMapper.writeValueAsString(disabledNode));
+
+                        messageService.sendMessage(UUID.fromString("2d61b0d1-1512-494b-ba1d-bf1c55de1173"),
+                                UUID.fromString(conversation_id),
+                                disableContent,
+                                null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+
                 String prompt = request.content.substring(8).trim();
 
                 String botTypingJson = "{\"type\":\"TYPING\", \"senderId\":\"bot_charles\"}";
@@ -111,11 +135,18 @@
                             ObjectNode botMsgNode = objectMapper.createObjectNode();
                             botMsgNode.put("type", "CHAT");
                             botMsgNode.put("id", System.currentTimeMillis());
-                            botMsgNode.put("user_id", "bot_charles");
+                            botMsgNode.put("user_id", "2d61b0d1-1512-494b-ba1d-bf1c55de1173");
                             botMsgNode.put("content", aiSummary); // Trả về bản tóm tắt
                             botMsgNode.put("attachment_url", (String) null);
 
                             broadcastToRoom(UUID.fromString(conversation_id), objectMapper.writeValueAsString(botMsgNode));
+
+                            messageService.sendMessage(
+                                    UUID.fromString("2d61b0d1-1512-494b-ba1d-bf1c55de1173"),
+                                    UUID.fromString(conversation_id),
+                                    aiSummary,
+                                    null
+                            );
                         } catch (Exception e) {
                             e.printStackTrace();
                             broadcastToRoom(UUID.fromString(conversation_id), "{\"type\":\"CHAT\", \"user_id\":\"bot_charles\", \"content\":\"Charles không đọc được lịch sử chat, thử lại sau nhé bạn hiền!\"}");
@@ -126,11 +157,11 @@
                         try {
                             String aiResponse = chatbotService.ask(prompt);
 
-                            // Tạo chuỗi JSON giả lập tin nhắn của Bot
+
                             ObjectNode botMsgNode = objectMapper.createObjectNode();
                             botMsgNode.put("type", "CHAT");
                             botMsgNode.put("id", System.currentTimeMillis()); // ID tạm thời
-                            botMsgNode.put("user_id", "bot_charles");         // Quy ước ID của bot
+                            botMsgNode.put("user_id", "2d61b0d1-1512-494b-ba1d-bf1c55de1173");
                             botMsgNode.put("content", aiResponse);
                             botMsgNode.put("attachment_url", (String) null);
 

@@ -158,4 +158,21 @@ public class UserService{
         User existing_user = userRepo.find("username = ?1 AND password = ?2", username, password).firstResult();
         return existing_user;
     }
+
+    public long countAllUsers() {
+        return userRepo.count();
+    }
+
+    @Transactional
+    public void anonymizeUser(UUID userId) {
+        User user = userRepo.findById(userId);
+        if (user != null) {
+            user.setUsername("Người dùng đã xóa");
+            user.setEmail("deleted_" + UUID.randomUUID().toString() + "@chatify.com");
+            user.setPassword(UUID.randomUUID().toString());
+            user.setAvatar_url("https://cdn-icons-png.flaticon.com/512/149/149071.png");
+
+            userRepo.persist(user);
+        }
+    }
 }

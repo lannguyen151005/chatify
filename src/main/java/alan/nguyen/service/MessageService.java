@@ -10,7 +10,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +35,10 @@ public class MessageService{
         if(count==0)
             throw new WebApplicationException("Bạn không có quyền xem tin nhắn của phòng này", Response.Status.FORBIDDEN);
 
-        return messageRepo.find("conversation_id = ?1 order by created_at asc", conversation_id)
+        return messageRepo.find(
+                        "conversation_id = ?1 order by created_at desc",
+                        conversation_id
+                )
                 .page(page, size)
                 .list();
     }
@@ -69,5 +74,13 @@ public class MessageService{
                 .createQuery(query, MessageResponseDTO.class)
                 .setParameter(1, conversationId)
                 .getResultList();
+    }
+
+    public long countMessagesToday() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.atTime(LocalTime.MAX);
+        return messageRepo.count("created_at BETWEEN ?1 AND ?2", start, end);
     }
 }

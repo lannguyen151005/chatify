@@ -84,4 +84,12 @@ public class ConversationService{
         return Response.ok().build();
 
     }
+
+    public long countAllConversations() {
+        return conversationRepo.count();
+    }
+
+    public List<Conversation> getAllRooms() {
+        return conversationRepo.listAll();
+    }
 }
